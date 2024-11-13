@@ -1,15 +1,21 @@
-FROM golang:latest AS build-env
-MAINTAINER Opstree Solutions
+FROM golang:latest
+
 WORKDIR /app
-ENV SRC_DIR=/go/src/gitlab.com/opstree/ot-go-webapp/
-ADD . $SRC_DIR
-RUN cd $SRC_DIR && \
-    go mod tidy && \
-    go build -o ot-go-webapp && \
-    cp ot-go-webapp /app/
+
+COPY . .
+
+RUN go mod init gitlab.com/opstree/ot-go-webapp
+
+RUN go mod tidy
+
+RUN go build -o ot-go-webapp
 
 FROM alpine:latest
+
 WORKDIR /app
+
 RUN apk add --no-cache libc6-compat bash
-COPY --from=build-env /app/ot-go-webapp /app/
+
+COPY --from=0 /app/ot-go-webapp /app/
+
 ENTRYPOINT ["./ot-go-webapp"]
