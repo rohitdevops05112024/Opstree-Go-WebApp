@@ -1,5 +1,7 @@
 @Library('ot-central-ci') _
+
 def cipipeline = new opstree.ci.templates.go_ci.go_ci()
+
 node {
   cipipeline.call([
     // WORKSPACE MANAGEMENT
@@ -32,7 +34,7 @@ node {
     gitleaks_check: true,
     fail_job_if_leak_detected: false,
     gitleaks_report_format: "html",
-    gitleaks_report_jenkins_publish: false,
+    gitleaks_report_jenkins_publish: true,  // Enable report publishing
 
     // Build Configuration
     perform_code_build: true,
