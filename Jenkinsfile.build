@@ -2,6 +2,8 @@
 def cipipeline = new opstree.ci.templates.go_ci.go_ci()
 
 node {
+  def workspacePath = pwd()  // Get the current workspace path
+  
   cipipeline.call([
     // WORKSPACE MANAGEMENT
     clean_workspace: true,
@@ -86,17 +88,19 @@ node {
     notification_channel: "teams",
     webhook_url_creds_id: "teams_webhook"
   ])
-  
+
   // Check if the Gitleaks report exists and publish it
-  if (fileExists('/var/lib/jenkins/workspace/rohit_pipeline/gitleaks/gitleaks_report.html')) {
+  def gitleaksReportPath = "${workspacePath}/gitleaks/gitleaks_report.html"
+
+  if (fileExists(gitleaksReportPath)) {
     publishHTML([ 
       reportName: "Gitleaks Report", 
-      reportDir: '/var/lib/jenkins/workspace/rohit_pipeline/gitleaks', 
+      reportDir: "${workspacePath}/gitleaks", 
       reportFiles: 'gitleaks_report.html', 
       keepAll: true, 
       alwaysLinkToLastBuild: true
     ])
   } else {
-    echo "[ERROR] Gitleaks report not found"
+    echo "[ERROR] Gitleaks report not found at ${gitleaksReportPath}"
   }
 }
