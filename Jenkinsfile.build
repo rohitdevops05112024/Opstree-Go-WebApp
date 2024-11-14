@@ -3,6 +3,11 @@
 def cipipeline = new opstree.ci.templates.go_ci.go_ci()
 
 node {
+  // Ensuring the repository path is marked as safe to avoid Git error
+  stage('Set Git Safe Directory') {
+    sh 'git config --global --add safe.directory /path'
+  }
+
   cipipeline.call([
     // WORKSPACE MANAGEMENT
     clean_workspace: true,
