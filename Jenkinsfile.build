@@ -1,5 +1,6 @@
 @Library('ot-central-ci') _
 def cipipeline = new opstree.ci.templates.go_ci.go_ci()
+
 node {
   cipipeline.call([
     // WORKSPACE MANAGEMENT
@@ -85,4 +86,17 @@ node {
     notification_channel: "teams",
     webhook_url_creds_id: "teams_webhook"
   ])
+  
+  // Check if the Gitleaks report exists and publish it
+  if (fileExists('/var/lib/jenkins/workspace/rohit_pipeline/gitleaks/gitleaks_report.html')) {
+    publishHTML([ 
+      reportName: "Gitleaks Report", 
+      reportDir: '/var/lib/jenkins/workspace/rohit_pipeline/gitleaks', 
+      reportFiles: 'gitleaks_report.html', 
+      keepAll: true, 
+      alwaysLinkToLastBuild: true
+    ])
+  } else {
+    echo "[ERROR] Gitleaks report not found"
+  }
 }
